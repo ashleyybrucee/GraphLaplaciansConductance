@@ -1,6 +1,12 @@
 import math
 import numpy as np
 
+Adj = [[0, 1, 1, 0],
+     [1, 0, 1, 1],
+     [1, 1, 0, 1],
+     [0, 1, 1, 0]]
+
+
 def printBinNum (binNum):
     if len(binNums) == 1:
         print("000" + binNums)
@@ -11,51 +17,43 @@ def printBinNum (binNum):
     else:
         print(binNums)
 
-A = [[0, 1, 1, 0],
-     [1, 0, 1, 1],
-     [1, 1, 0, 1],
-     [0, 1, 1, 0]]
 
-size = len(A)
+def findConductance (A):
+    # GIVES US BINARY ARRAY
+    conductance = math.inf
+    size = len(A)
+    numPartitions = 2 ** (size - 1)
+    for i in range (1, numPartitions):
+        binArray = np.zeros(size)
+        binString = str(bin(i))
+        binNums = binString[2:]
+        counter = len(binArray) - 1
+        for digit in reversed(binNums):
+            binArray[counter] = int(digit)
+            counter -= 1
 
-conductance = math.inf
+        # SET PARTITIONING
+        ones = []
+        zeros = []
+        for j in range(len(binArray)):
+            if binArray[j] == 1:
+                ones.append(j)
+            else:
+                zeros.append(j)
 
-# GIVES US BINARY ARRAY
-numPartitions = 2 ** (size - 1)
-for i in range (1, numPartitions):
-    binArray = np.zeros(size)
-    binString = str(bin(i))
-    binNums = binString[2:]
-    #printBinNum (binNums)
-    counter = len(binArray) - 1
-    for digit in reversed(binNums):
-        binArray[counter] = int(digit)
-        counter -= 1
+        capacity = 0
+        for one in ones:
+            for zero in zeros:
+                if A[one][zero] != 0:
+                    capacity += A[one][zero]
 
-    #print("binArray", binArray)
+        if capacity < conductance:
+            conductance = capacity
+    return conductance
 
-    # separating the set indices into arrays
-    ones = []
-    zeros = []
-    for j in range(len(binArray)):
-        if binArray[j] == 1:
-            ones.append(j)
-        else:
-            zeros.append(j)
-    #print(ones)
-    #print(zeros)
-    
-    #print("bin array", binArray)
-    capacity = 0
-    for one in ones:
-        for zero in zeros:
-            if A[one][zero] != 0:
-                capacity += A[one][zero]
-    print("Capacity", capacity)
-    if capacity < conductance:
-        conductance = capacity
 
-print("Conductance", conductance)
+theConductance = findConductance(Adj)
+print("Conductance", theConductance)
 
 
 
