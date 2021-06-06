@@ -5,7 +5,6 @@ import scipy.linalg as linalg
 from datetime import datetime
 from scipy.sparse import csgraph
 
-
 def printBinNum (binNums):
     if len(binNums) == 1:
         print("000" + binNums)
@@ -93,6 +92,29 @@ def findConductanceMat (A):
         if capacity < conductance:
             conductance = capacity
     return conductance
+
+def calcWithMatrix (A):
+    ANp = np.array(A)
+    now = datetime.now()
+    print(now.strftime("%H:%M:%S"))
+    theConductance = findConductance(ANp)
+    now = datetime.now()
+    print(now.strftime("%H:%M:%S"))
+    print("Conductance", theConductance)
+
+
+def calcWithMatFile (A):
+    mat = scipy.io.loadmat(A)
+    matrix = mat['Problem']['A'][0][0]
+    denseMatrix = matrix.todense()
+    print(denseMatrix)
+
+    now = datetime.now()
+    print(now.strftime("%H:%M:%S"))
+    theConductance = findConductanceMat(denseMatrix)
+    now = datetime.now()
+    print(now.strftime("%H:%M:%S"))
+    print(theConductance)
 
 '''
 Pass an adjacency matrix to this function to get the Fiedler val
