@@ -1,8 +1,9 @@
 import math
 import numpy as np
 import scipy.io
+import scipy.linalg as linalg
 from datetime import datetime
-
+from scipy.sparse import csgraph
 
 
 def printBinNum (binNums):
@@ -93,6 +94,21 @@ def findConductanceMat (A):
             conductance = capacity
     return conductance
 
+'''
+Pass an adjacency matrix to this function to get the Fiedler val
+Make sure not to pass a Laplacian, since it will try to convert it
+and the resulting matrix won't be accurate
+'''
+def fiedlerVal(A):
+    if(type(A)!= 'numpy.matrix'):
+        print("converting from ",type(A))
+        A = np.matrix(A)
+    print("now type ",type(A))
+    #convert to Laplacian
+    L = csgraph.laplacian(A)
+    eig_vals, eig_vex = linalg.eig(L)
+    fiedler_val = np.sort(eig_vals.real)[1]
+    return fiedler_val
 
 '''
 # CONDUCTANCE FOR BASIC GRAPH
@@ -117,15 +133,3 @@ print(now.strftime("%H:%M:%S"))
 print(theConductance)
 
 '''
-
-
-
-
-
-
-
-
-
-
-
-

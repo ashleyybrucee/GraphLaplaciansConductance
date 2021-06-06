@@ -1,8 +1,10 @@
+from scipy.sparse import csgraph
+import numpy as np
+
 ours_4 = [[0, 1, 1, 0],
           [1, 0, 1, 1],
           [1, 1, 0, 1],
           [0, 1, 1, 0]]
-
 
 ours_9 = [[0, 1, 1, 0, 0, 0, 0, 0, 0],
           [1, 0, 1, 0, 0, 0, 0, 0, 0],
@@ -42,3 +44,5 @@ ours_15 = [[0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
            [0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0]]
 
+#CONVERT ADJACENCY MAT TO LAPLACIAN
+#l9 = csgraph.laplacian(np.matrix(ours_9))
