@@ -4,7 +4,6 @@ import scipy.io
 from datetime import datetime
 
 
-
 def printBinNum (binNums):
     if len(binNums) == 1:
         print("000" + binNums)
@@ -94,29 +93,29 @@ def findConductanceMat (A):
     return conductance
 
 
-'''
-# CONDUCTANCE FOR BASIC GRAPH
-now = datetime.now()
-print(now.strftime("%H:%M:%S"))
-theConductance = findConductance(ours_9)
-print(now.strftime("%H:%M:%S"))
-print("Conductance", theConductance)
-###
+def calcWithMatrix (A):
+    ANp = np.array(A)
+    now = datetime.now()
+    print(now.strftime("%H:%M:%S"))
+    theConductance = findConductance(ANp)
+    now = datetime.now()
+    print(now.strftime("%H:%M:%S"))
+    print("Conductance", theConductance)
 
-# CONDUCTANCE FOR MAT GRAPH
-mat = scipy.io.loadmat('file.mat')
-matrix = mat['Problem']['A'][0][0]
-denseMatrix = matrix.todense()
-print(denseMatrix)
 
-now = datetime.now()
-print(now.strftime("%H:%M:%S"))
-theConductance = findConductanceMat(denseMatrix)
-now = datetime.now()
-print(now.strftime("%H:%M:%S"))
-print(theConductance)
+def calcWithMatFile (A):
+    mat = scipy.io.loadmat(A)
+    matrix = mat['Problem']['A'][0][0]
+    denseMatrix = matrix.todense()
+    print(denseMatrix)
 
-'''
+    now = datetime.now()
+    print(now.strftime("%H:%M:%S"))
+    theConductance = findConductanceMat(denseMatrix)
+    now = datetime.now()
+    print(now.strftime("%H:%M:%S"))
+    print(theConductance)
+
 
 
 
