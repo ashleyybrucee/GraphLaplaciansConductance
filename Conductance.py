@@ -1,17 +1,11 @@
 import math
 import numpy as np
 import scipy.io
-import scipy as sp
-import pandas as pd
+from datetime import datetime
 
 
-Adj = [[0, 1, 1, 0],
-     [1, 0, 1, 1],
-     [1, 1, 0, 1],
-     [0, 1, 1, 0]]
 
-
-def printBinNum (binNum):
+def printBinNum (binNums):
     if len(binNums) == 1:
         print("000" + binNums)
     elif len(binNums) == 2:
@@ -51,6 +45,11 @@ def findConductance (A):
                 if A[one][zero] != 0:
                     capacity += A[one][zero]
 
+        if len(ones) < len(zeros):
+            capacity = capacity / len(ones)
+        else:
+            capacity = capacity / len(zeros)
+
         if capacity < conductance:
             conductance = capacity
     return conductance
@@ -85,23 +84,39 @@ def findConductanceMat (A):
                 if A[one, zero] != 0:
                     capacity += A[one, zero]
 
+        if len(ones) < len(zeros):
+            capacity = capacity / len(ones)
+        else:
+            capacity = capacity / len(zeros)
+
         if capacity < conductance:
             conductance = capacity
     return conductance
 
 
-# theConductance = findConductance(Adj)
-# print("Conductance", theConductance)
+'''
+# CONDUCTANCE FOR BASIC GRAPH
+now = datetime.now()
+print(now.strftime("%H:%M:%S"))
+theConductance = findConductance(ours_9)
+print(now.strftime("%H:%M:%S"))
+print("Conductance", theConductance)
+###
 
-mat = scipy.io.loadmat('GD06_theory.mat')
+# CONDUCTANCE FOR MAT GRAPH
+mat = scipy.io.loadmat('file.mat')
 matrix = mat['Problem']['A'][0][0]
-
-# dense matrix
 denseMatrix = matrix.todense()
+print(denseMatrix)
 
+now = datetime.now()
+print(now.strftime("%H:%M:%S"))
 theConductance = findConductanceMat(denseMatrix)
+now = datetime.now()
+print(now.strftime("%H:%M:%S"))
 print(theConductance)
 
+'''
 
 
 
