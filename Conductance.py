@@ -142,13 +142,13 @@ def normalizedLaplacian (A):
 
     D = np.copy(Diag)
 
-    # calculated normalized adjacency matrix
+    # calculated normalized degree matrix
     for i in range (len(A)):
         currVal = Diag[i, i]
         sqrtVal = math.sqrt(currVal)
         Diag[i, i] = 1 / sqrtVal
 
-    # calculates normalized laplacian from normalized adjacency
+    # calculates normalized laplacian
     normA = Diag * A * Diag
     I = np.identity(len(A))
     normL = I - normA
@@ -167,6 +167,17 @@ def findCondApprox (A):
     print("Fiedler", fVal)
     print("Lower", lowerBound)
     print("Upper", upperBound)
+
+def nonNormalizedBounds(A):
+    fVal = fiedlerValA(A)
+    print(fVal)
+    lowerBound = fVal / 2
+    upperBound = math.sqrt(2 * fVal)
+    print("Lower", lowerBound)
+    print("Upper", upperBound)
+
+
+
 
 
 
