@@ -102,7 +102,6 @@ def calcWithMatrix (A):
     print(now.strftime("%H:%M:%S"))
     print("Conductance", theConductance)
 
-
 def calcWithMatFile (A):
     mat = scipy.io.loadmat(A)
     matrix = mat['Problem']['A'][0][0]
@@ -122,36 +121,14 @@ Make sure not to pass a Laplacian, since it will try to convert it
 and the resulting matrix won't be accurate
 '''
 def fiedlerVal(A):
-    if(type(A)!= 'numpy.matrix'):
-        print("converting from ",type(A))
+    if (type (A) != 'numpy.matrix'):
+        print ("converting from ",type(A))
         A = np.matrix(A)
-    print("now type ",type(A))
-    #convert to Laplacian
+    print ("now type ",type(A))
+    # convert to Laplacian
     L = csgraph.laplacian(A)
     eig_vals, eig_vex = linalg.eig(L)
     fiedler_val = np.sort(eig_vals.real)[1]
     return fiedler_val
 
-'''
-# CONDUCTANCE FOR BASIC GRAPH
-now = datetime.now()
-print(now.strftime("%H:%M:%S"))
-theConductance = findConductance(ours_9)
-print(now.strftime("%H:%M:%S"))
-print("Conductance", theConductance)
-###
 
-# CONDUCTANCE FOR MAT GRAPH
-mat = scipy.io.loadmat('file.mat')
-matrix = mat['Problem']['A'][0][0]
-denseMatrix = matrix.todense()
-print(denseMatrix)
-
-now = datetime.now()
-print(now.strftime("%H:%M:%S"))
-theConductance = findConductanceMat(denseMatrix)
-now = datetime.now()
-print(now.strftime("%H:%M:%S"))
-print(theConductance)
-
-'''
