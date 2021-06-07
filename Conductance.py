@@ -5,6 +5,7 @@ import scipy.linalg as linalg
 from datetime import datetime
 from scipy.sparse import csgraph
 
+
 def printBinNum (binNums):
     if len(binNums) == 1:
         print("000" + binNums)
@@ -14,7 +15,6 @@ def printBinNum (binNums):
         print("0" + binNums)
     else:
         print(binNums)
-
 
 def findConductance (A):
     conductance = math.inf
@@ -53,7 +53,6 @@ def findConductance (A):
         if capacity < conductance:
             conductance = capacity
     return conductance
-
 
 def findConductanceMat (A):
     conductance = math.inf
@@ -96,10 +95,10 @@ def findConductanceMat (A):
 def calcWithMatrix (A):
     ANp = np.array(A)
     now = datetime.now()
-    print(now.strftime("%H:%M:%S"))
+    print("Start Conductance:", now.strftime("%H:%M:%S"))
     theConductance = findConductance(ANp)
     now = datetime.now()
-    print(now.strftime("%H:%M:%S"))
+    print("End Conductance:", now.strftime("%H:%M:%S"))
     print("Conductance", theConductance)
 
 def calcWithMatFile (A):
@@ -109,18 +108,13 @@ def calcWithMatFile (A):
     print(denseMatrix)
 
     now = datetime.now()
-    print(now.strftime("%H:%M:%S"))
+    print("Start Conductance:", now.strftime("%H:%M:%S"))
     theConductance = findConductanceMat(denseMatrix)
     now = datetime.now()
-    print(now.strftime("%H:%M:%S"))
+    print("End Conductance:", now.strftime("%H:%M:%S"))
     print(theConductance)
 
-'''
-Pass an adjacency matrix to this function to get the Fiedler val
-Make sure not to pass a Laplacian, since it will try to convert it
-and the resulting matrix won't be accurate
-'''
-def fiedlerVal(A):
+def fiedlerValA(A):
     if (type (A) != 'numpy.matrix'):
         print ("converting from ",type(A))
         A = np.matrix(A)
@@ -130,5 +124,51 @@ def fiedlerVal(A):
     eig_vals, eig_vex = linalg.eig(L)
     fiedler_val = np.sort(eig_vals.real)[1]
     return fiedler_val
+
+def fiedlerValL(L):
+    eig_vals, eig_vex = linalg.eig(L)
+    fiedler_val = np.sort(eig_vals.real)[1]
+    return fiedler_val
+
+def normalizedLaplacian (A):
+    if type (A) != 'numpy.matrix':
+        A = np.matrix(A)
+
+    # gets diagonal from laplacian
+    L = csgraph.laplacian(A)
+    Diag = np.zeros(A.shape)
+    D = np.diag (L)
+    np.fill_diagonal(Diag, D)
+
+    D = np.copy(Diag)
+
+    # calculated normalized adjacency matrix
+    for i in range (len(A)):
+        currVal = Diag[i, i]
+        sqrtVal = math.sqrt(currVal)
+        Diag[i, i] = 1 / sqrtVal
+
+    # calculates normalized laplacian from normalized adjacency
+    normA = Diag * A * Diag
+    I = np.identity(len(A))
+    normL = I - normA
+
+    return normL
+
+def findCondApprox (A):
+    now = datetime.now()
+    print("Start Fiedler Approx:", now.strftime("%H:%M:%S"))
+    L = normalizedLaplacian(A)
+    fVal = fiedlerValL(L)
+    lowerBound = fVal / 2
+    upperBound = math.sqrt(2 * fVal)
+    now = datetime.now()
+    print("End Fiedler Approx:", now.strftime("%H:%M:%S"))
+    print("Fiedler", fVal)
+    print("Lower", lowerBound)
+    print("Upper", upperBound)
+
+
+
 
 
