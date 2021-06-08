@@ -5,7 +5,10 @@ import scipy.linalg as linalg
 from datetime import datetime
 from scipy.sparse import csgraph
 
+import A9s
+import Laplacians
 
+# helper function to determine binary set partitioning
 def printBinNum (binNums):
     if len(binNums) == 1:
         print("000" + binNums)
@@ -16,46 +19,29 @@ def printBinNum (binNums):
     else:
         print(binNums)
 
-def findConductance (A):
-    conductance = math.inf
+# helper function to count number of edges in a graph
+def calcEdgeNumber (A):
     size = len(A)
-    # GIVES US BINARY ARRAY
-    numPartitions = 2 ** (size - 1)
-    for i in range (1, numPartitions):
-        binArray = np.zeros(size)
-        binString = str(bin(i))
-        binNums = binString[2:]
-        counter = len(binArray) - 1
-        for digit in reversed(binNums):
-            binArray[counter] = int(digit)
-            counter -= 1
+    edges = 0
+    for i in range (size):
+        for j in range (i, size):
+            edges = edges + A[i][j]
+    return edges
 
-        # SET PARTITIONING
-        ones = []
-        zeros = []
-        for j in range(len(binArray)):
-            if binArray[j] == 1:
-                ones.append(j)
-            else:
-                zeros.append(j)
+# returns the min degree between two sets
+def setDegrees (L, setA, setB):
+    edgeA = 0
+    edgeB = 0
+    for node in setA:
+        edgeA = edgeA + L[node, node]
+    for node in setB:
+        edgeB = edgeB + L[node, node]
 
-        capacity = 0
-        for one in ones:
-            for zero in zeros:
-                if A[one][zero] != 0:
-                    capacity += A[one][zero]
+    return min(edgeA, edgeB)
 
-        if len(ones) < len(zeros):
-            capacity = capacity / len(ones)
-        else:
-            capacity = capacity / len(zeros)
-
-        if capacity < conductance:
-            conductance = capacity
-    return conductance
-
-def findConductanceMat (A):
-    conductance = math.inf
+# calculates isoperimetric ratio
+def findisoR (A):
+    isoR = math.inf
     size = len(A)
     # GIVES US BINARY ARRAY
     numPartitions = 2 ** (size - 1)
@@ -88,32 +74,32 @@ def findConductanceMat (A):
         else:
             capacity = capacity / len(zeros)
 
-        if capacity < conductance:
-            conductance = capacity
-    return conductance
+        if capacity < isoR:
+            isoR = capacity
+    return isoR
 
-def calcWithMatrix (A):
+def isoWithMatrix (A):
     ANp = np.array(A)
     now = datetime.now()
-    print("Start Conductance:", now.strftime("%H:%M:%S"))
-    theConductance = findConductance(ANp)
+    print("Start IsoR:", now.strftime("%H:%M:%S"))
+    isoR = findisoR(ANp)
     now = datetime.now()
-    print("End Conductance:", now.strftime("%H:%M:%S"))
-    print("Conductance", theConductance)
-
-def calcWithMatFile (A):
+    print("End IsoR:", now.strftime("%H:%M:%S"))
+    print("IsoR", isoR)
+def isoWithMatFile (A):
     mat = scipy.io.loadmat(A)
     matrix = mat['Problem']['A'][0][0]
     denseMatrix = matrix.todense()
     print(denseMatrix)
 
     now = datetime.now()
-    print("Start Conductance:", now.strftime("%H:%M:%S"))
-    theConductance = findConductanceMat(denseMatrix)
+    print("Start IsoR:", now.strftime("%H:%M:%S"))
+    isoR = findisoR(denseMatrix)
     now = datetime.now()
-    print("End Conductance:", now.strftime("%H:%M:%S"))
-    print(theConductance)
+    print("End IsoR:", now.strftime("%H:%M:%S"))
+    print(isoR)
 
+# calculates Fiedler vector, with Adjacency or Laplacian
 def fiedlerValA(A):
     if (type (A) != 'numpy.matrix'):
         # print ("converting from ",type(A))
@@ -123,39 +109,45 @@ def fiedlerValA(A):
     L = csgraph.laplacian(A)
     eig_vals, eig_vex = linalg.eig(L)
     fiedler_val = np.sort(eig_vals.real)[1]
+    print(eig_vals)
     return fiedler_val
-
 def fiedlerValL(L):
     eig_vals, eig_vex = linalg.eig(L)
     fiedler_val = np.sort(eig_vals.real)[1]
     print(eig_vals)
     return fiedler_val
 
-def normalizedLaplacian (A):
-    if type (A) != 'numpy.matrix':
+# calculates the normalized laplacian
+def normalizedLaplacian(A):
+    if type(A) != 'numpy.matrix':
         A = np.matrix(A)
 
     # gets diagonal from laplacian
     L = csgraph.laplacian(A)
     Diag = np.zeros(A.shape)
-    D = np.diag (L)
+    D = np.diag(L)
     np.fill_diagonal(Diag, D)
 
     D = np.copy(Diag)
 
     # calculated normalized degree matrix
-    for i in range (len(A)):
+    for i in range(len(A)):
         currVal = Diag[i, i]
         sqrtVal = math.sqrt(currVal)
         Diag[i, i] = 1 / sqrtVal
 
-    # calculates normalized laplacian
-    normA = Diag * A * Diag
+    # three different ways to calculate the normalized Laplacian
+    normA = Diag @ A @ Diag
     I = np.identity(len(A))
-    normL = I - normA
+    normLbynormA = I - normA
 
-    return normL
+    normLbyDA = Diag @ (D - A) @ Diag
 
+    normLbyL = Diag @ L @ Diag
+
+    return normLbyL
+
+# calculates the Cheeger's inequality for conductance approximation
 def findCondApprox (A):
     now = datetime.now()
     print("Start Fiedler Approx:", now.strftime("%H:%M:%S"))
@@ -169,21 +161,64 @@ def findCondApprox (A):
     print("Lower", lowerBound)
     print("Upper", upperBound)
 
-def nonNormalizedBounds(A):
-    fVal = fiedlerValA(A)
-    print(fVal)
-    lowerBound = fVal / 2
-    upperBound = math.sqrt(2 * fVal)
-    print("Lower", lowerBound)
-    print("Upper", upperBound)
-
-def calcEdgeNumber (A):
+# finds the conductance of a graph
+def findCond (A):
+    conductance = math.inf
     size = len(A)
-    edges = 0
-    for i in range (size):
-        for j in range (i, size):
-            edges = edges + A[i][j]
-    return edges
+    # GIVES US BINARY ARRAY
+    numPartitions = 2 ** (size - 1)
+    for i in range(1, numPartitions):
+        binArray = np.zeros(size)
+        binString = str(bin(i))
+        binNums = binString[2:]
+        counter = len(binArray) - 1
+        for digit in reversed(binNums):
+            binArray[counter] = int(digit)
+            counter -= 1
 
+        # SET PARTITIONING
+        ones = []
+        zeros = []
+        for j in range(len(binArray)):
+            if binArray[j] == 1:
+                ones.append(j)
+            else:
+                zeros.append(j)
 
+        capacity = 0
+        for one in ones:
+            for zero in zeros:
+                if A[one, zero] != 0:
+                    capacity += A[one, zero]
 
+        L = csgraph.laplacian(A)
+        minEdges = setDegrees(L, ones, zeros)
+        if len(ones) < len(zeros):
+            capacity = capacity / minEdges
+        else:
+            capacity = capacity / minEdges
+
+        if capacity < conductance:
+            conductance = capacity
+    return conductance
+
+def condWithMatrix (A):
+    ANp = np.array(A)
+    now = datetime.now()
+    print("Start Cond:", now.strftime("%H:%M:%S"))
+    theConductance = findCond(ANp)
+    now = datetime.now()
+    print("End Cond:", now.strftime("%H:%M:%S"))
+    print("Cond", theConductance)
+def condWithMatFile (A):
+    mat = scipy.io.loadmat(A)
+    matrix = mat['Problem']['A'][0][0]
+    denseMatrix = matrix.todense()
+    print(denseMatrix)
+
+    now = datetime.now()
+    print("Start Cond:", now.strftime("%H:%M:%S"))
+    theConductance = findCond(denseMatrix)
+    now = datetime.now()
+    print("End Cond:", now.strftime("%H:%M:%S"))
+    print(theConductance)
