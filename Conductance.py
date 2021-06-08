@@ -116,9 +116,9 @@ def calcWithMatFile (A):
 
 def fiedlerValA(A):
     if (type (A) != 'numpy.matrix'):
-        print ("converting from ",type(A))
+        # print ("converting from ",type(A))
         A = np.matrix(A)
-    print ("now type ",type(A))
+    # print ("now type ",type(A))
     # convert to Laplacian
     L = csgraph.laplacian(A)
     eig_vals, eig_vex = linalg.eig(L)
@@ -128,6 +128,7 @@ def fiedlerValA(A):
 def fiedlerValL(L):
     eig_vals, eig_vex = linalg.eig(L)
     fiedler_val = np.sort(eig_vals.real)[1]
+    print(eig_vals)
     return fiedler_val
 
 def normalizedLaplacian (A):
@@ -177,9 +178,13 @@ def nonNormalizedBounds(A):
     print("Upper", upperBound)
 
 
-
-
-
+def calcEdgeNumber (A):
+    size = len(A)
+    edges = 0
+    for i in range (size):
+        for j in range (i, size):
+            edges = edges + A[i][j]
+    return edges
 
 
 
