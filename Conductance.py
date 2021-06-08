@@ -177,7 +177,6 @@ def nonNormalizedBounds(A):
     print("Lower", lowerBound)
     print("Upper", upperBound)
 
-
 def calcEdgeNumber (A):
     size = len(A)
     edges = 0
