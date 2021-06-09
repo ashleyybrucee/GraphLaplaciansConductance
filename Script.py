@@ -1,8 +1,6 @@
 import numpy as np
 import math
 from scipy.sparse import csgraph
-from datetime import datetime
-import A9s
 import Laplacians
 
 def diag (A):
@@ -39,8 +37,6 @@ def diag (A):
     print (normLbyL)
 
     return normLbyL
-
-
 
 
 diag(Laplacians.ours_4)

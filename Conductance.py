@@ -102,9 +102,7 @@ def isoWithMatFile (A):
 # calculates Fiedler vector, with Adjacency or Laplacian
 def fiedlerValA(A):
     if (type (A) != 'numpy.matrix'):
-        # print ("converting from ",type(A))
         A = np.matrix(A)
-    # print ("now type ",type(A))
     # convert to Laplacian
     L = csgraph.laplacian(A)
     eig_vals, eig_vex = linalg.eig(L)
@@ -114,7 +112,6 @@ def fiedlerValA(A):
 def fiedlerValL(L):
     eig_vals, eig_vex = linalg.eig(L)
     fiedler_val = np.sort(eig_vals.real)[1]
-    print(eig_vals)
     return fiedler_val
 
 # calculates the normalized laplacian
@@ -150,13 +147,11 @@ def normalizedLaplacian(A):
 # calculates the Cheeger's inequality for conductance approximation
 def findCondApprox (A):
     now = datetime.now()
-    print("Start Fiedler Approx:", now.strftime("%H:%M:%S"))
     L = normalizedLaplacian(A)
     fVal = fiedlerValL(L)
     lowerBound = fVal / 2
     upperBound = math.sqrt(2 * fVal)
     now = datetime.now()
-    print("End Fiedler Approx:", now.strftime("%H:%M:%S"))
     print("Fiedler", fVal)
     print("Lower", lowerBound)
     print("Upper", upperBound)
@@ -214,7 +209,7 @@ def condWithMatFile (A):
     mat = scipy.io.loadmat(A)
     matrix = mat['Problem']['A'][0][0]
     denseMatrix = matrix.todense()
-    print(denseMatrix)
+    #print(denseMatrix)
 
     now = datetime.now()
     print("Start Cond:", now.strftime("%H:%M:%S"))
@@ -222,3 +217,4 @@ def condWithMatFile (A):
     now = datetime.now()
     print("End Cond:", now.strftime("%H:%M:%S"))
     print(theConductance)
+
