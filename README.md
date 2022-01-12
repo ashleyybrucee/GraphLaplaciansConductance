@@ -1,0 +1,3 @@
+# GraphLaplaciansConductance
+
+The conductance of a graph, also known as Cheeger’s constant, is a measure of how “well-knit” the graph is. The Fiedler value, the second smallest eigenvalue of a graph, gives us a measure of the algebraic connectivity among the elements in a network. The isoperimetric number is another metric of connectivity similar to the conductance that measures volume by quantity of vertices rather than total degree of a cut set. Our project is a case study that looks at the comparison of these values across graphs of different sizes and of differing levels of connectivity. We determine the calculation limitations and look at how accurate various approximations of these metrics are.
